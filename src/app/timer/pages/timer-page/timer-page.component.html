@@ -1,0 +1,26 @@
+<mat-card>
+  <mat-tab-group [selectedIndex]="(selectedTabIndex$ | async)"
+                 (selectedIndexChange)="tabChange($event)">
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <mat-icon>hourglass_empty</mat-icon>
+        Timer
+      </ng-template>
+      <app-timer [controls]="controls"
+                 [active]="(selectedTabIndex$ | async) === 0"></app-timer>
+    </mat-tab>
+
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <mat-icon>timer</mat-icon>
+        Stopwatch
+      </ng-template>
+      <app-stopwatch [controls]="controls"
+                     [active]="(selectedTabIndex$ | async) === 1"></app-stopwatch>
+    </mat-tab>
+  </mat-tab-group>
+  <mat-card-actions>
+    <app-timer-controls [timerActive]="(selectedTabIndex$ | async) === 0"
+                        #controls></app-timer-controls>
+  </mat-card-actions>
+</mat-card>

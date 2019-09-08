@@ -1,0 +1,63 @@
+:host {
+  display: block;
+  cursor: pointer;
+  border: 1px solid transparent;
+  display: flex;
+  padding: 8px 16px;
+  position: relative;
+  flex-direction: column;
+  place-content: center;
+  min-height: 62px;
+}
+
+.time-display-digit {
+  border: none;
+  border-right: 1px solid transparent;
+  font-size: 62px;
+  outline: none;
+  width: 38px;
+
+  &.time-display-small-digit {
+    font-size: 35px;
+  }
+
+  @media (max-width: 1000px) {
+    font-size: 32px;
+
+    &.time-display-small-digit {
+      font-size: 24px;
+    }
+  }
+}
+
+
+.time-display-sep {
+  display: inline-block;
+  font-size: 28px;
+  outline: none;
+  padding-right: 18px;
+}
+
+@media (max-width: 1000px) {
+  .time-display-sep {
+    font-size: 20px;
+  }
+}
+
+.time-input-form {
+    font-size: 16px;
+    display: flex;
+    .mat-form-field,
+    .mat-button {
+        flex: 1;
+    }
+    ::ng-deep {
+        .mat-form-field-infix {
+            width: auto;
+            input {
+                text-align: right;
+                padding-right: 4px;
+            }
+        }
+    }
+}

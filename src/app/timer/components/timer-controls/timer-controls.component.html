@@ -1,0 +1,33 @@
+<button mat-button
+        class="start-button"
+        (click)="startStop()">
+
+  <span *ngIf="timerActive && !(timerEnd$ | async) && !(timerStart$ | async)">Start</span>
+  <span *ngIf="timerActive && !(timerEnd$ | async) && (timerStart$ | async)">Stop</span>
+  <span *ngIf="timerActive && (timerEnd$ | async)">Ok</span>
+  <span *ngIf="!timerActive && !(stopwatchStart$ | async)">Start</span>
+  <span *ngIf="!timerActive && (stopwatchStart$ | async)">Stop</span>
+</button>
+<button mat-button
+        class="reset-button"
+        (click)="reset()">Reset</button>
+<span class="flex-spacer"></span>
+<button mat-icon-button
+        *ngIf="timerActive"
+        (click)="toggleAlarm()">
+  <mat-icon *ngIf="(alarmEnabled$ | async)">volume_up</mat-icon>
+  <mat-icon *ngIf="!(alarmEnabled$ | async)">volume_off</mat-icon>
+</button>
+<button mat-icon-button
+        (click)="toggleFullscreen()">
+  <mat-icon *ngIf="!(fullScreen$ | async)">fullscreen</mat-icon>
+  <mat-icon *ngIf="(fullScreen$ | async)">fullscreen_exit</mat-icon>
+</button>
+
+<audio #alarm
+       loop="loop">
+  <source src="/assets/alarm.oga"
+          type="audio/ogg">
+  <source src="/assets/alarm.mp3"
+          type="audio/mp3">
+</audio>
