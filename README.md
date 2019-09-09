@@ -1,6 +1,24 @@
 
 # SharkTimer
 
+This is a small app that implements a timer/stopwatch widget as an Angular component, similar to what you'll see in the results of a Google search for either "[stopwatch](https://www.google.com/search?q=stopwatch)" or "[timer](https://www.google.com/search?q=timer)"
+
+Grab the code and refactor it so that it meets your standard for production ready code.
+
+You do not need to keep the existing code or project structure.
+
+The only requirement is that it maintains basic the functionality of a timer/stopwatch, and that it meets your standards!
+
+## Original Output Example
+
+### Timer
+
+![page image](timer.gif?raw=true)
+
+### Stopwatch
+
+![page image](stopwatch.gif?raw=true)
+
 ## Getting started
 
 Fork + clone this repo and run `npm install` in the root directory of the repo.
