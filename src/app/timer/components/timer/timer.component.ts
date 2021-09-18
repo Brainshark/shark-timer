@@ -1,9 +1,9 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { BehaviorSubject, EMPTY, Observable, Subject, timer } from 'rxjs';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
+import { EMPTY, Observable } from 'rxjs';
 import { filter, map, mapTo, scan, startWith, switchMap, takeUntil, takeWhile, tap } from 'rxjs/operators';
 
 import { TimeDisplayComponent } from '../time-display/time-display.component';
-import { TimerControlsComponent } from '../timer-controls/timer-controls.component';
+import { TimerControlBase } from '../timer-control-base';
 
 @Component({
   selector: 'app-timer',
@@ -11,26 +11,19 @@ import { TimerControlsComponent } from '../timer-controls/timer-controls.compone
   styleUrls: ['./timer.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class TimerComponent implements OnInit, OnDestroy {
+export class TimerComponent extends TimerControlBase implements OnInit {
   @ViewChild('timeDisplay') timeDisplay: TimeDisplayComponent;
-  @Input() controls: TimerControlsComponent;
-  @Input() active: boolean;
-
-  time$: Observable<number>;
   percent$: Observable<number>;
-  start$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
-  interval$: Observable<number>;
-  reset$: Subject<void> = new Subject<void>();
-  destroyed$: Subject<void> = new Subject<void>();
-
   startTime: number = 5 + 1000 * 60 * 5;
 
-  constructor(private cd: ChangeDetectorRef) { }
+  constructor(cd: ChangeDetectorRef) {
+    super(cd);
+  }
 
   ngOnInit() {
-    this.interval$ = timer(0, 10);
+    super.ngOnInit();
 
-    this.controls.timerReset$.subscribe(() => {
+    this.controls.reset$.subscribe(() => {
       this.resetTimer(this.startTime);
       this.controls.stop();
       this.cd.markForCheck();
@@ -40,29 +33,24 @@ export class TimerComponent implements OnInit, OnDestroy {
       filter(settingTime => settingTime),
     ).subscribe(() => this.controls.stop());
 
-    this.controls.timerStart$.pipe(
+    this.controls.start$.pipe(
       filter(start => start),
     ).subscribe(() => this.timeDisplay.endSetTime());
-
-  }
-
-  ngOnDestroy() {
-    this.destroyed$.next();
-    this.destroyed$.complete();
   }
 
   resetTimer(startTime: number) {
     this.reset$.next();
     this.controls.end(false);
 
-    this.time$ = this.controls.timerStart$.pipe(
+    this.time$ = this.controls.start$.pipe(
       filter(() => this.active),
       switchMap(start => (start ? this.interval$.pipe(mapTo(10)) : EMPTY)),
       scan((acc, val) => acc - val, startTime),
       startWith(startTime),
       tap(val => {
         if (val === 0) {
-          this.controls.end(true);
+          // We only want to sound the alarm if it was already started
+          this.controls.end(this.controls.start$.value);
         }
       }),
       takeUntil(this.reset$),

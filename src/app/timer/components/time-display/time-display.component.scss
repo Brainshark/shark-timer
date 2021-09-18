@@ -1,6 +1,5 @@
 :host {
   display: block;
-  cursor: pointer;
   border: 1px solid transparent;
   display: flex;
   padding: 8px 16px;
@@ -8,6 +7,10 @@
   flex-direction: column;
   place-content: center;
   min-height: 62px;
+
+  &.can-set-time {
+    cursor: pointer;
+  }
 }
 
 .time-display-digit {
@@ -47,9 +50,11 @@
 .time-input-form {
     font-size: 16px;
     display: flex;
+    padding-top: 9px;
     .mat-form-field,
     .mat-button {
         flex: 1;
+        margin: 0 10px;
     }
     ::ng-deep {
         .mat-form-field-infix {

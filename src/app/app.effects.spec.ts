@@ -1,4 +1,5 @@
-import { TestBed, inject } from '@angular/core/testing';
+import { TestBed } from '@angular/core/testing';
+import { Actions } from '@ngrx/effects';
 import { provideMockActions } from '@ngrx/effects/testing';
 import { Observable } from 'rxjs';
 
@@ -16,6 +17,7 @@ describe('AppEffects', () => {
       ]
     });
 
+    actions$ = TestBed.get(Actions);
     effects = TestBed.get(AppEffects);
   });
 

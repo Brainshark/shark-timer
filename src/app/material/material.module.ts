@@ -33,4 +33,9 @@ import { MatToolbarModule } from '@angular/material/toolbar';
     MatToolbarModule
   ]
 })
+/*
+  This works fine for small projects, but I wouldn't normally create a whole module for material
+  I would generally only include the modules that are absolutely needed for a given module,
+  so that the module bundles are as small as possible
+*/
 export class MaterialModule {}

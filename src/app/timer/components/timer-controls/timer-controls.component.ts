@@ -1,6 +1,16 @@
-import { ChangeDetectionStrategy, Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
-import { BehaviorSubject, Subject } from 'rxjs';
-import { retry } from 'rxjs/operators';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  ElementRef,
+  EventEmitter,
+  Input,
+  OnInit,
+  Output,
+  ViewChild
+} from '@angular/core';
+import { BehaviorSubject, combineLatest, Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: 'app-timer-controls',
@@ -9,66 +19,73 @@ import { retry } from 'rxjs/operators';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TimerControlsComponent implements OnInit {
-  @ViewChild('alarm') alarmElementRef: ElementRef;
-  @Input() timerActive: boolean;
+  /*
+    One could also use AfterViewInit, but I like doing it this way for most cases so that
+    if a viewchild/contentchild has an ngIf, or some other structural directive that makes it come and go,
+    then we are sure to have the new reference every time.
+  */
+  @ViewChild('alarm') set alarmElementRef(value: ElementRef) {
+    // In typescript 3.7 we can do value?.nativeElement instead
+    this.alarm = value ? value.nativeElement : null;
+  }
 
-  timerStart$ = new BehaviorSubject<boolean>(false);
-  timerEnd$ = new BehaviorSubject<boolean>(false);
-  timerReset$ = new BehaviorSubject<number>(0);
+  // This change was to make it more generic
+  @Input() hasAlarm: boolean;
+  @Input() fullScreen: boolean;
+  @Output() fullScreenChange = new EventEmitter<boolean>();
 
-  stopwatchStart$ = new BehaviorSubject<boolean>(false);
-  stopwatchReset$ = new Subject<void>();
+  start$ = new BehaviorSubject<boolean>(false);
+  end$ = new BehaviorSubject<boolean>(false);
+  reset$ = new BehaviorSubject<number>(0);
 
   alarm: HTMLAudioElement;
   alarmEnabled$ = new BehaviorSubject<boolean>(true);
   alarmSounding$ = new BehaviorSubject<boolean>(false);
 
-  fullScreen$ = new BehaviorSubject<boolean>(false);
 
-  constructor() { }
+  protected destroyed$: Subject<void> = new Subject<void>();
+
+  constructor(private cdr: ChangeDetectorRef) { }
 
   ngOnInit() {
-    this.alarm = this.alarmElementRef.nativeElement;
+    combineLatest([this.alarmEnabled$, this.alarmSounding$])
+      .pipe(takeUntil(this.destroyed$)).subscribe(([alarmEnabled, alarmSounding]) => {
+        if (this.alarm) {
+          if (alarmEnabled && alarmSounding) {
+            this.alarm.play();
+          } else {
+            this.alarm.pause();
+          }
+        }
+      });
   }
 
   startStop() {
-    if (this.timerActive) {
-      if (!this.timerEnd$.value) {
-        this.timerStart$.next(!this.timerStart$.value);
+    if (this.hasAlarm) {
+      if (!this.end$.value) {
+        this.start$.next(!this.start$.value);
       } else {
         this.stopAlarm();
       }
     } else {
-      this.stopwatchStart$.next(!this.stopwatchStart$.value);
+      this.start$.next(!this.start$.value);
     }
   }
 
   start() {
-    if (this.timerActive) {
-      this.timerStart$.next(true);
-    } else {
-      this.stopwatchStart$.next(true);
-    }
+    this.start$.next(true);
   }
 
   stop() {
-    if (this.timerActive) {
-      this.timerStart$.next(false);
-    } else {
-      this.stopwatchStart$.next(false);
-    }
+    this.start$.next(false);
   }
 
   reset() {
-    if (this.timerActive) {
-      this.timerReset$.next(0);
-    } else {
-      this.stopwatchReset$.next();
-    }
+    this.reset$.next(0);
   }
 
   end(timerComplete: boolean) {
-    this.timerEnd$.next(timerComplete);
+    this.end$.next(timerComplete);
     if (timerComplete) {
       this.startAlarm();
     }
@@ -79,24 +96,17 @@ export class TimerControlsComponent implements OnInit {
   }
 
   startAlarm() {
-    if (this.alarmEnabled$.value && !this.alarmSounding$.value) {
-      this.alarmSounding$.next(true);
-      this.alarm.play();
-    }
+    this.alarmSounding$.next(true);
   }
 
   stopAlarm() {
-    if (this.alarmEnabled$.value && this.alarmSounding$.value) {
-      this.alarmSounding$.next(false);
-      this.alarm.pause();
-    }
+    this.alarmSounding$.next(false);
+    this.reset();
   }
 
   toggleFullscreen() {
-    this.fullScreen$.next(!this.fullScreen$.value);
-  }
-
-  get started() {
-    return this.timerActive ? this.timerStart$.value : this.stopwatchStart$.value;
+    this.fullScreen = !this.fullScreen;
+    this.fullScreenChange.emit(this.fullScreen);
+    this.cdr.markForCheck();
   }
 }

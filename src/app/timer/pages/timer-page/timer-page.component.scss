@@ -5,9 +5,38 @@
   padding: 8px;
   background-color: #f5f5f5;
 
-
   .mat-icon {
     margin-right: 8px;
+  }
+
+  > .mat-card {
+    display: flex;
+    flex-direction: column;
+
+    > .mat-tab-group {
+      flex: 1;
+    }
+
+    > .mat-card-actions {
+      flex: 0;
+    }
+
+    &.full-screen {
+      height: 100%;
+
+      & ::ng-deep {
+        .mat-tab-body-wrapper,
+        .mat-tab-body {
+          height: 100%;
+        }
+
+        .mat-tab-body-content {
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+        }
+      }
+    }
   }
 
   ::ng-deep {

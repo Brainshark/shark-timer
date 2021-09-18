@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
-import { TimerPageComponent } from './timer/pages/timer-page/timer-page.component';
+import { TimerPageComponent } from './timer/pages';
 
 const routes: Routes = [
   { path: 'timer', component: TimerPageComponent, data: {view: 'timer'} },

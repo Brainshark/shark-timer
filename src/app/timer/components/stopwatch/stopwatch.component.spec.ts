@@ -20,7 +20,7 @@ describe('StopwatchComponent', () => {
     beforeEach(() => {
         fixture = TestBed.createComponent(StopwatchComponent);
         component = fixture.componentInstance;
-        component.controls = new TimerControlsComponent();
+        component.controls = TestBed.createComponent(TimerControlsComponent).componentInstance;
         fixture.detectChanges();
     });
 

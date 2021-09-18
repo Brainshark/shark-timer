@@ -1,13 +1,13 @@
-<mat-card>
-  <mat-tab-group [selectedIndex]="(selectedTabIndex$ | async)"
+<!-- I moved (selectedTabIndex$ | async) up here, because each call to the async pipe creates it's own subscription, but we really only need 1 subscription. -->
+<mat-card *ngIf="selectedTabIndex$ | async as tab" [ngClass]="{'full-screen': isFullScreen }">
+  <mat-tab-group [selectedIndex]="tab.index"
                  (selectedIndexChange)="tabChange($event)">
     <mat-tab>
       <ng-template mat-tab-label>
         <mat-icon>hourglass_empty</mat-icon>
         Timer
       </ng-template>
-      <app-timer [controls]="controls"
-                 [active]="(selectedTabIndex$ | async) === 0"></app-timer>
+      <app-timer [controls]="controls" [active]="tab.index === 0"></app-timer>
     </mat-tab>
 
     <mat-tab>
@@ -15,12 +15,12 @@
         <mat-icon>timer</mat-icon>
         Stopwatch
       </ng-template>
-      <app-stopwatch [controls]="controls"
-                     [active]="(selectedTabIndex$ | async) === 1"></app-stopwatch>
+      <app-stopwatch [controls]="controls" [active]="tab.index === 1"></app-stopwatch>
     </mat-tab>
   </mat-tab-group>
   <mat-card-actions>
-    <app-timer-controls [timerActive]="(selectedTabIndex$ | async) === 0"
+    <app-timer-controls [hasAlarm]="tab.index === 0"
+                        [(fullScreen)]="isFullScreen"
                         #controls></app-timer-controls>
   </mat-card-actions>
 </mat-card>

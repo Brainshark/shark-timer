@@ -1,28 +1,35 @@
-<button mat-button
-        class="start-button"
-        (click)="startStop()">
-
-  <span *ngIf="timerActive && !(timerEnd$ | async) && !(timerStart$ | async)">Start</span>
-  <span *ngIf="timerActive && !(timerEnd$ | async) && (timerStart$ | async)">Stop</span>
-  <span *ngIf="timerActive && (timerEnd$ | async)">Ok</span>
-  <span *ngIf="!timerActive && !(stopwatchStart$ | async)">Start</span>
-  <span *ngIf="!timerActive && (stopwatchStart$ | async)">Stop</span>
-</button>
-<button mat-button
-        class="reset-button"
-        (click)="reset()">Reset</button>
-<span class="flex-spacer"></span>
-<button mat-icon-button
-        *ngIf="timerActive"
-        (click)="toggleAlarm()">
-  <mat-icon *ngIf="(alarmEnabled$ | async)">volume_up</mat-icon>
-  <mat-icon *ngIf="!(alarmEnabled$ | async)">volume_off</mat-icon>
-</button>
-<button mat-icon-button
-        (click)="toggleFullscreen()">
-  <mat-icon *ngIf="!(fullScreen$ | async)">fullscreen</mat-icon>
-  <mat-icon *ngIf="(fullScreen$ | async)">fullscreen_exit</mat-icon>
-</button>
+<!-- Move the async pipes up here so that they are only run once -->
+<ng-container
+    *ngIf="{
+        start: (start$ | async),
+        end: (end$ | async),
+        alarmEnabled: (alarmEnabled$ | async)
+    } as vars"
+>
+    <button mat-button
+            class="start-button"
+            (click)="startStop()">
+        <span *ngIf="!vars.end && !vars.start">Start</span>
+        <span *ngIf="!vars.end && vars.start">Stop</span>
+        <span *ngIf="vars.end">Ok</span>
+    </button>
+    <button mat-button
+            class="reset-button"
+            (click)="reset()">Reset</button>
+    <span class="flex-spacer"></span>
+    <button mat-icon-button
+            *ngIf="hasAlarm"
+            (click)="toggleAlarm()">
+        <!-- One could also do a ternary statement here for volume_up/volume_off depending on coding styles -->
+        <mat-icon *ngIf="vars.alarmEnabled">volume_up</mat-icon>
+        <mat-icon *ngIf="!vars.alarmEnabled">volume_off</mat-icon>
+    </button>
+    <button mat-icon-button
+            (click)="toggleFullscreen()">
+        <mat-icon *ngIf="!fullScreen">fullscreen</mat-icon>
+        <mat-icon *ngIf="fullScreen">fullscreen_exit</mat-icon>
+    </button>
+</ng-container>
 
 <audio #alarm
        loop="loop">

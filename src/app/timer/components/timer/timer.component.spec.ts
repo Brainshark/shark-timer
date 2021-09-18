@@ -20,7 +20,7 @@ describe('TimerComponent', () => {
     beforeEach(() => {
         fixture = TestBed.createComponent(TimerComponent);
         component = fixture.componentInstance;
-        component.controls = new TimerControlsComponent();
+        component.controls = TestBed.createComponent(TimerControlsComponent).componentInstance;
         fixture.detectChanges();
     });
 

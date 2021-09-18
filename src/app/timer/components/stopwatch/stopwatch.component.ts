@@ -1,8 +1,7 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnDestroy, OnInit } from '@angular/core';
-import { BehaviorSubject, EMPTY, Observable, Subject, timer } from 'rxjs';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { EMPTY } from 'rxjs';
 import { filter, mapTo, scan, switchMap, takeUntil } from 'rxjs/operators';
-
-import { TimerControlsComponent } from '../timer-controls/timer-controls.component';
+import { TimerControlBase } from '../timer-control-base';
 
 @Component({
   selector: 'app-stopwatch',
@@ -10,38 +9,26 @@ import { TimerControlsComponent } from '../timer-controls/timer-controls.compone
   styleUrls: ['./stopwatch.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class StopwatchComponent implements OnInit, OnDestroy {
-  @Input() controls: TimerControlsComponent;
-  @Input() active: boolean;
+export class StopwatchComponent extends TimerControlBase implements OnInit {
 
-  time$: Observable<number>;
-  start$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
-  interval$: Observable<number>;
-  reset$: Subject<void> = new Subject<void>();
-  destroyed$: Subject<void> = new Subject<void>();
-
-  constructor(private cd: ChangeDetectorRef) { }
+  constructor(cd: ChangeDetectorRef) {
+    super(cd);
+  }
 
   ngOnInit() {
-    this.interval$ = timer(0, 10);
-    this.resetTimer();
+    super.ngOnInit();
 
-    this.controls.stopwatchReset$.subscribe(() => {
+    this.controls.reset$.pipe(takeUntil(this.destroyed$)).subscribe(() => {
       this.resetTimer();
       this.controls.stop();
       this.cd.markForCheck();
     });
   }
 
-  ngOnDestroy() {
-    this.destroyed$.next();
-    this.destroyed$.complete();
-  }
-
   resetTimer() {
     this.reset$.next();
 
-    this.time$ = this.controls.stopwatchStart$.pipe(
+    this.time$ = this.controls.start$.pipe(
       filter(() => this.active),
       switchMap(start => (start ? this.interval$.pipe(mapTo(10)) : EMPTY)),
       scan((acc, val) => acc + val, 0),
