@@ -12,7 +12,7 @@ import { TimerControlsComponent } from '../timer-controls/timer-controls.compone
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TimerComponent implements OnInit, OnDestroy {
-  @ViewChild('timeDisplay') timeDisplay: TimeDisplayComponent;
+  @ViewChild('timeDisplay', { static: true }) timeDisplay: TimeDisplayComponent;
   @Input() controls: TimerControlsComponent;
   @Input() active: boolean;
 
