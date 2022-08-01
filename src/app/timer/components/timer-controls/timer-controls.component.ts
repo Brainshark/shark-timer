@@ -9,7 +9,7 @@ import { retry } from 'rxjs/operators';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TimerControlsComponent implements OnInit {
-  @ViewChild('alarm') alarmElementRef: ElementRef;
+  @ViewChild('alarm', { static: true }) alarmElementRef: ElementRef;
   @Input() timerActive: boolean;
 
   timerStart$ = new BehaviorSubject<boolean>(false);
